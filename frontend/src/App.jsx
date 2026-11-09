@@ -239,7 +239,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen min-w-[320px] bg-[#fafaf7] text-stone-900">
+    <div className="min-h-screen bg-[#fafaf7] text-stone-900">
       <SiteHeader onLogin={() => openAuth('login')} onLogout={() => setLogoutConfirmOpen(true)} onNavigate={navigate} onSignup={() => openAuth('signup')} page={page} user={user} />
       <main className="mx-auto min-h-[calc(100vh-150px)] max-w-7xl px-4 sm:px-7 lg:px-10">
         <div className="pt-4">

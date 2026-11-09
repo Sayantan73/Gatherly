@@ -7,17 +7,99 @@ const labelClass = 'block text-xs font-bold text-stone-700'
 export default function EventFormPage({ initialValues, editing, registeredCount = 0, onSubmit, onBack, error, saving }) {
   const [date, setDate] = useState(() => initialValues.date?.split('T')[0] || '')
   const [time, setTime] = useState(() => initialValues.date?.split('T')[1] || '')
+  const [timePickerOpen, setTimePickerOpen] = useState(false)
+  const [timeParts, setTimeParts] = useState({ hour: '', minute: '', period: '' })
+  const [selectedTimeParts, setSelectedTimeParts] = useState([])
+  const [timeError, setTimeError] = useState('')
+
+  const openTimePicker = () => {
+    const [hour = '', minute = ''] = time.split(':')
+    const hour24 = Number(hour)
+    setTimeParts(time ? {
+      hour: String(hour24 % 12 || 12),
+      minute,
+      period: hour24 >= 12 ? 'PM' : 'AM',
+    } : { hour: '', minute: '', period: '' })
+    setSelectedTimeParts([])
+    setTimePickerOpen(true)
+    setTimeError('')
+  }
+
+  const updateTimePart = (part, value) => {
+    const nextParts = { ...timeParts, [part]: value }
+    const nextSelectedParts = [...new Set([...selectedTimeParts, part])]
+    setTimeParts(nextParts)
+    setSelectedTimeParts(nextSelectedParts)
+
+    if (nextSelectedParts.length === 3 && nextParts.hour && nextParts.minute && nextParts.period) {
+      const hour12 = Number(nextParts.hour) % 12
+      const hour24 = hour12 + (nextParts.period === 'PM' ? 12 : 0)
+      setTime(`${String(hour24).padStart(2, '0')}:${nextParts.minute}`)
+      setTimePickerOpen(false)
+      setTimeError('')
+    }
+  }
+
+  const handleSubmit = (event) => {
+    if (!time) {
+      event.preventDefault()
+      setTimeError('Choose an event time before continuing.')
+      return
+    }
+    onSubmit(event, initialValues._id)
+  }
+
+  const formattedTime = time
+    ? `${Number(time.split(':')[0]) % 12 || 12}:${time.split(':')[1]} ${Number(time.split(':')[0]) >= 12 ? 'PM' : 'AM'}`
+    : 'Choose a time'
 
   return (
     <section className="mx-auto max-w-3xl py-8 sm:py-12">
       <button className="mb-6 text-sm font-semibold text-stone-600 hover:text-stone-950" onClick={onBack} type="button">← Back to my events</button>
       <SectionHeading description="Every great story starts with an invitation." eyebrow={editing ? 'Make it just right' : 'Let’s make a plan'} title={editing ? 'Edit your event' : 'Start a gathering'} />
-      <form className="space-y-5 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7" onSubmit={(event) => onSubmit(event, initialValues._id)}>
+      <form className="space-y-5 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7" onSubmit={handleSubmit}>
         <label className={labelClass}>Event name<input className={fieldClass} defaultValue={initialValues.title} maxLength="100" minLength="3" name="title" placeholder="e.g. Sunday morning ceramics" required /></label>
         <label className={labelClass}>A little about it<textarea className={`${fieldClass} min-h-32 resize-y py-3`} defaultValue={initialValues.description} maxLength="2000" minLength="10" name="description" placeholder="What should people know before they come?" required /></label>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className={labelClass}>Date<input className={fieldClass} onChange={(event) => setDate(event.target.value)} required type="date" value={date} /></label>
-          <label className={labelClass}>Time<input className={fieldClass} onChange={(event) => { setTime(event.target.value); event.currentTarget.blur() }} required type="time" value={time} /></label>
+          <div>
+            <span className={labelClass}>Time</span>
+            <button
+              aria-controls="event-time-picker"
+              aria-expanded={timePickerOpen}
+              className={`${fieldClass} text-left`}
+              onClick={() => timePickerOpen ? setTimePickerOpen(false) : openTimePicker()}
+              type="button"
+            >
+              {formattedTime}
+            </button>
+            {timePickerOpen && (
+              <div className="mt-2 rounded-xl border border-stone-200 bg-stone-50 p-3" id="event-time-picker">
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: 'hour', label: 'Hour', values: Array.from({ length: 12 }, (_, index) => String(index + 1)) },
+                    { key: 'minute', label: 'Minute', values: Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0')) },
+                    { key: 'period', label: 'AM / PM', values: ['AM', 'PM'] },
+                  ].map(({ key, label, values }) => (
+                    <label className="min-w-0 text-[11px] font-bold text-stone-600" key={key}>
+                      {label}
+                      <select
+                        aria-label={label}
+                        className={`${fieldClass} mt-1 px-2`}
+                        onChange={(event) => updateTimePart(key, event.target.value)}
+                        value={timeParts[key]}
+                      >
+                        <option value="">--</option>
+                        {values.map((value) => <option key={value} value={value}>{value}</option>)}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-5 text-stone-500">Choose an hour, minute, and AM or PM. The picker closes when all three are selected.</p>
+              </div>
+            )}
+            {timeError && <p className="mt-2 text-xs text-rose-800" role="alert">{timeError}</p>}
+          </div>
           <label className={labelClass}>How many seats?<input className={fieldClass} defaultValue={initialValues.seatLimit || 50} max="10000" min={Math.max(1, registeredCount)} name="seatLimit" required type="number" /></label>
         </div>
         <input name="date" type="hidden" value={date && time ? `${date}T${time}` : ''} />
