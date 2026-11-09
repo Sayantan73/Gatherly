@@ -3,13 +3,17 @@ const { test } = require('node:test')
 const { getCorsOptions } = require('../src/config/security')
 const { ensureDatabaseConnection } = require('../src/middleware/requireDatabase')
 
-test('CORS accepts comma-separated frontend origins and removes trailing slashes', () => {
+test('CORS allows configured frontend origins and removes trailing slashes', async () => {
   const previous = process.env.CLIENT_URL
   process.env.CLIENT_URL = 'https://gatherly-u229.vercel.app/, https://preview.example.com/'
   try {
-    assert.deepEqual(getCorsOptions(), {
-      origin: ['https://gatherly-u229.vercel.app', 'https://preview.example.com'],
+    const { origin } = getCorsOptions()
+    const checkOrigin = (value) => new Promise((resolve, reject) => {
+      origin(value, (error, allowed) => error ? reject(error) : resolve(allowed))
     })
+    assert.equal(await checkOrigin('https://gatherly-u229.vercel.app'), true)
+    assert.equal(await checkOrigin('https://preview.example.com'), true)
+    assert.equal(await checkOrigin('https://unknown.example.com'), false)
   } finally {
     if (previous === undefined) delete process.env.CLIENT_URL
     else process.env.CLIENT_URL = previous

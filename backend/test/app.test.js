@@ -21,6 +21,19 @@ test('health endpoint responds without a database connection', async () => {
   assert.deepEqual(await response.json(), { status: 'ok' })
 })
 
+test('CORS allows the deployed frontend origin', async () => {
+  const response = await fetch(`${baseUrl}/api/events`, {
+    method: 'OPTIONS',
+    headers: {
+      Origin: 'https://gatherly-u229.vercel.app',
+      'Access-Control-Request-Method': 'GET',
+      'Access-Control-Request-Headers': 'authorization,content-type',
+    },
+  })
+  assert.equal(response.status, 204)
+  assert.equal(response.headers.get('access-control-allow-origin'), 'https://gatherly-u229.vercel.app')
+})
+
 test('unknown paths return a JSON 404', async () => {
   const response = await fetch(`${baseUrl}/not-a-route`)
   assert.equal(response.status, 404)

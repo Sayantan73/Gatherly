@@ -1,10 +1,30 @@
+const defaultOrigins = [
+  'http://localhost:5173',
+  'https://gatherly-u229.vercel.app',
+]
+
 function getCorsOptions() {
-  const origins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  const origins = [
+    ...defaultOrigins,
+    ...(process.env.CLIENT_URL || '')
     .split(',')
     .map((value) => value.trim())
-    .filter(Boolean)
-    .map((value) => new URL(value).origin)
-  return { origin: origins }
+    .filter(Boolean),
+  ].map((value) => new URL(value).origin)
+
+  const allowedOrigins = new Set(origins)
+  return {
+    origin(origin, callback) {
+      if (!origin) return callback(null, true)
+      let normalizedOrigin
+      try {
+        normalizedOrigin = new URL(origin).origin
+      } catch {
+        return callback(null, false)
+      }
+      return callback(null, allowedOrigins.has(normalizedOrigin))
+    },
+  }
 }
 
 function configureTrustProxy(app) {
