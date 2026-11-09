@@ -1,19 +1,4 @@
-function normalizeApiUrl(value) {
-  const configuredUrl = value?.trim().replace(/\/+$/, '')
-  if (!configuredUrl) return '/api'
-
-  if (/^https?:\/\//i.test(configuredUrl)) {
-    const url = new URL(configuredUrl)
-    if (!/\/api$/i.test(url.pathname.replace(/\/+$/, ''))) {
-      url.pathname = `${url.pathname.replace(/\/+$/, '')}/api`
-    }
-    return url.toString().replace(/\/+$/, '')
-  }
-
-  return /\/api$/i.test(configuredUrl)
-    ? configuredUrl
-    : `${configuredUrl}/api`
-}
+import { normalizeApiUrl } from './utils/apiUrl'
 
 const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL)
 let token = sessionStorage.getItem('event-token') || ''
