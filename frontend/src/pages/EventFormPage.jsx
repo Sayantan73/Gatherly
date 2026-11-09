@@ -17,7 +17,7 @@ export default function EventFormPage({ initialValues, editing, registeredCount 
         <label className={labelClass}>A little about it<textarea className={`${fieldClass} min-h-32 resize-y py-3`} defaultValue={initialValues.description} maxLength="2000" minLength="10" name="description" placeholder="What should people know before they come?" required /></label>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className={labelClass}>Date<input className={fieldClass} onChange={(event) => setDate(event.target.value)} required type="date" value={date} /></label>
-          <label className={labelClass}>Time<input className={fieldClass} onChange={(event) => setTime(event.target.value)} required type="time" value={time} /></label>
+          <label className={labelClass}>Time<input className={fieldClass} onChange={(event) => { setTime(event.target.value); event.currentTarget.blur() }} required type="time" value={time} /></label>
           <label className={labelClass}>How many seats?<input className={fieldClass} defaultValue={initialValues.seatLimit || 50} max="10000" min={Math.max(1, registeredCount)} name="seatLimit" required type="number" /></label>
         </div>
         <input name="date" type="hidden" value={date && time ? `${date}T${time}` : ''} />
