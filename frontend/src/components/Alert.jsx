@@ -1,0 +1,12 @@
+import Icon from './Icon'
+
+export default function Alert({ message, onDismiss }) {
+  if (!message) return null
+  return (
+    <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950" role="status">
+      <Icon className="mt-0.5 shrink-0 text-amber-700" name="check" size={17} />
+      <p className="flex-1">{message}</p>
+      <button aria-label="Dismiss message" className="rounded p-1 text-amber-800 hover:bg-amber-100" onClick={onDismiss} type="button"><Icon name="close" size={16} /></button>
+    </div>
+  )
+}
