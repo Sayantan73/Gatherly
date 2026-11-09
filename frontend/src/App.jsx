@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Alert from './components/Alert'
 import AuthModal from './components/AuthModal'
+import LogoutConfirmModal from './components/LogoutConfirmModal'
 import SiteFooter from './components/SiteFooter'
 import SiteHeader from './components/SiteHeader'
 import { api, apiRoutes, setAuthToken } from './api'
@@ -31,6 +32,7 @@ export default function App() {
   const [attendees, setAttendees] = useState([])
   const [notice, setNotice] = useState('')
   const [authOpen, setAuthOpen] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [authError, setAuthError] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
@@ -236,13 +238,9 @@ export default function App() {
     else openAuth('signup')
   }
 
-  const confirmSignOut = () => {
-    if (window.confirm('Are you sure you want to log out?')) signOut()
-  }
-
   return (
     <div className="min-h-screen min-w-[320px] bg-[#fafaf7] text-stone-900">
-      <SiteHeader onLogin={() => openAuth('login')} onLogout={confirmSignOut} onNavigate={navigate} onSignup={() => openAuth('signup')} page={page} user={user} />
+      <SiteHeader onLogin={() => openAuth('login')} onLogout={() => setLogoutConfirmOpen(true)} onNavigate={navigate} onSignup={() => openAuth('signup')} page={page} user={user} />
       <main className="mx-auto min-h-[calc(100vh-150px)] max-w-7xl px-4 sm:px-7 lg:px-10">
         <div className="pt-4">
           <Alert message={notice} onDismiss={dismissNotice} />
@@ -257,6 +255,7 @@ export default function App() {
       </main>
       <SiteFooter />
       {authOpen && <AuthModal error={authError} loading={authLoading} mode={authMode} onClose={() => setAuthOpen(false)} onModeChange={(mode) => { setAuthMode(mode); setAuthError('') }} onSubmit={handleAuth} />}
+      {logoutConfirmOpen && <LogoutConfirmModal onClose={() => setLogoutConfirmOpen(false)} onConfirm={() => { setLogoutConfirmOpen(false); signOut() }} />}
     </div>
   )
 }
