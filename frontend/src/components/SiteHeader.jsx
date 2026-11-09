@@ -4,7 +4,7 @@ const linkStyle = (active) => `whitespace-nowrap border-b-2 px-1 py-5 text-sm fo
   active ? 'border-lime-700 text-stone-950' : 'border-transparent text-stone-500 hover:text-stone-900'
 }`
 
-export default function SiteHeader({ user, page, onNavigate, onLogin, onLogout }) {
+export default function SiteHeader({ user, page, onNavigate, onLogin, onSignup, onLogout }) {
   return (
     <header className="sticky top-0 z-20 border-b border-stone-200 bg-[#fafaf7]/95 backdrop-blur">
       <div className="mx-auto flex h-[68px] max-w-7xl items-center gap-6 px-4 sm:px-7 lg:px-10">
@@ -23,7 +23,10 @@ export default function SiteHeader({ user, page, onNavigate, onLogin, onLogout }
               <button aria-label="Sign out" className="grid size-9 place-items-center rounded-full border border-stone-300 text-stone-600 transition hover:border-stone-800 hover:text-stone-950" onClick={onLogout} title="Sign out" type="button"><Icon name="logout" size={17} /></button>
             </>
           ) : (
-            <button className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-stone-900 px-4 text-sm font-semibold text-white transition hover:bg-stone-700" onClick={onLogin} type="button">Log in <Icon name="arrow" size={16} /></button>
+            <>
+              <button className="inline-flex min-h-10 items-center justify-center rounded-lg border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-stone-500 hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-700 sm:px-4" onClick={onLogin} type="button">Log in</button>
+              <button className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-stone-900 px-3 text-sm font-semibold text-white transition hover:bg-stone-700 sm:px-4" onClick={onSignup} type="button">Join now <Icon name="arrow" size={16} /></button>
+            </>
           )}
         </div>
       </div>

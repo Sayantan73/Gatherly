@@ -5,6 +5,7 @@ const fieldClass = 'mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg
 
 export default function AuthModal({ mode, onClose, onModeChange, onSubmit, error, loading }) {
   const [role, setRole] = useState('attendee')
+  const [showPassword, setShowPassword] = useState(false)
   const signingUp = mode === 'signup'
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-stone-950/60 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
@@ -20,12 +21,17 @@ export default function AuthModal({ mode, onClose, onModeChange, onSubmit, error
             <label className="block text-xs font-bold text-stone-700">I’m here to…<select className={fieldClass} onChange={(event) => setRole(event.target.value)} value={role}><option value="attendee">Find and join events</option><option value="organizer">Host events</option></select></label>
           </>}
           <label className="block text-xs font-bold text-stone-700">Email address<input autoComplete="email" className={fieldClass} maxLength="254" name="email" placeholder="you@example.com" required type="email" /></label>
-          <label className="block text-xs font-bold text-stone-700">Password<input autoComplete={signingUp ? 'new-password' : 'current-password'} className={fieldClass} maxLength="128" minLength={signingUp ? 8 : undefined} name="password" placeholder={signingUp ? 'At least 8 characters' : 'Your password'} required type="password" /></label>
+          <label className="block text-xs font-bold text-stone-700">Password
+            <span className="relative mt-1.5 block">
+              <input autoComplete={signingUp ? 'new-password' : 'current-password'} className={`${fieldClass} mt-0 pr-12`} maxLength="128" minLength={signingUp ? 8 : undefined} name="password" placeholder={signingUp ? 'At least 8 characters' : 'Your password'} required type={showPassword ? 'text' : 'password'} />
+              <button aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} className="absolute inset-y-1 right-1 grid w-9 place-items-center rounded-md text-stone-500 transition-colors hover:bg-transparent hover:text-lime-800 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-lime-700 active:text-lime-900" onClick={() => setShowPassword((visible) => !visible)} type="button"><Icon className="pointer-events-none" name={showPassword ? 'eyeOff' : 'eye'} size={18} /></button>
+            </span>
+          </label>
           {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">{error}</p>}
           <button className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-stone-900 px-4 text-sm font-bold text-white transition hover:bg-stone-700 disabled:cursor-wait disabled:opacity-60" disabled={loading} type="submit">{loading ? 'One moment…' : signingUp ? 'Create account' : 'Log in'} {!loading && <Icon name="arrow" size={16} />}</button>
         </form>
         <p className="mt-5 text-center text-xs text-stone-600">{signingUp ? 'Already part of the gathering?' : 'New around here?'}{' '}
-          <button className="font-bold text-lime-900 underline decoration-lime-700 underline-offset-2" onClick={() => onModeChange(signingUp ? 'login' : 'signup')} type="button">{signingUp ? 'Log in' : 'Create an account'}</button>
+          <button className="font-bold text-lime-900 underline decoration-lime-700 underline-offset-2" onClick={() => { setShowPassword(false); onModeChange(signingUp ? 'login' : 'signup') }} type="button">{signingUp ? 'Log in' : 'Create an account'}</button>
         </p>
       </section>
     </div>

@@ -32,7 +32,7 @@ export default function EventDetailPage({ event, user, onBack, onRegister, onEdi
                 {event.isRegistered ? <><Icon name="check" /> You’re on the list</> : unavailable ? 'Registration unavailable' : registering ? 'Saving your seat…' : <>Save me a seat <Icon name="arrow" size={16} /></>}
               </button>
               : user ? <p className="rounded-lg bg-stone-100 px-3 py-3 text-center text-xs text-stone-600">Only attendees can register for events.</p>
-                : <button className="mt-2 min-h-12 w-full rounded-lg bg-stone-900 px-4 text-sm font-bold text-white transition hover:bg-stone-700" onClick={onRegister} type="button">Log in to join <Icon className="ml-2 inline" name="arrow" size={16} /></button>}
+                : <button className="mt-2 min-h-12 w-full rounded-lg bg-stone-900 px-4 text-sm font-bold text-white transition hover:bg-stone-700" onClick={onRegister} type="button">Join now <Icon className="ml-2 inline" name="arrow" size={16} /></button>}
           <p className="mt-3 text-center text-[10px] text-stone-500">Free to join · Good company guaranteed</p>
         </aside>
       </div>
