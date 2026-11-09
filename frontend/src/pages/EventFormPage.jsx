@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import SectionHeading from '../components/SectionHeading'
 
 const fieldClass = 'mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-lime-700 focus:ring-2 focus:ring-lime-700/15'
 const labelClass = 'block text-xs font-bold text-stone-700'
 
 export default function EventFormPage({ initialValues, editing, registeredCount = 0, onSubmit, onBack, error, saving }) {
+  const [date, setDate] = useState(() => initialValues.date?.split('T')[0] || '')
+  const [time, setTime] = useState(() => initialValues.date?.split('T')[1] || '')
+
   return (
     <section className="mx-auto max-w-3xl py-8 sm:py-12">
       <button className="mb-6 text-sm font-semibold text-stone-600 hover:text-stone-950" onClick={onBack} type="button">← Back to my events</button>
@@ -12,9 +16,11 @@ export default function EventFormPage({ initialValues, editing, registeredCount 
         <label className={labelClass}>Event name<input className={fieldClass} defaultValue={initialValues.title} maxLength="100" minLength="3" name="title" placeholder="e.g. Sunday morning ceramics" required /></label>
         <label className={labelClass}>A little about it<textarea className={`${fieldClass} min-h-32 resize-y py-3`} defaultValue={initialValues.description} maxLength="2000" minLength="10" name="description" placeholder="What should people know before they come?" required /></label>
         <div className="grid gap-5 sm:grid-cols-2">
-          <label className={labelClass}>Date & time<input className={fieldClass} defaultValue={initialValues.date} name="date" required type="datetime-local" /></label>
+          <label className={labelClass}>Date<input className={fieldClass} onChange={(event) => setDate(event.target.value)} required type="date" value={date} /></label>
+          <label className={labelClass}>Time<input className={fieldClass} onChange={(event) => setTime(event.target.value)} required type="time" value={time} /></label>
           <label className={labelClass}>How many seats?<input className={fieldClass} defaultValue={initialValues.seatLimit || 50} max="10000" min={Math.max(1, registeredCount)} name="seatLimit" required type="number" /></label>
         </div>
+        <input name="date" type="hidden" value={date && time ? `${date}T${time}` : ''} />
         <label className={labelClass}>Where’s it happening?<input className={fieldClass} defaultValue={initialValues.venue} maxLength="200" minLength="3" name="venue" placeholder="Venue name and city" required /></label>
         {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">{error}</p>}
         <div className="flex flex-col-reverse gap-3 border-t border-stone-100 pt-5 sm:flex-row sm:justify-between">
