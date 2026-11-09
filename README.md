@@ -50,7 +50,7 @@ Gatherly is a responsive event discovery and RSVP platform. Organizers can publi
 | `SEED_ORGANIZER_PASSWORD` | For seeding | Throwaway password of at least 8 characters. |
 | `SEED_ATTENDEE_EMAIL` | For seeding | Throwaway email for the sample attendee. |
 | `SEED_ATTENDEE_PASSWORD` | For seeding | Throwaway password of at least 8 characters. |
-| `VITE_API_URL` | No | Frontend API base URL; defaults to `/api` (local Vite proxies to port 5000). |
+| `VITE_API_URL` | No | Backend origin or API base URL. The frontend appends `/api` when omitted; defaults to `/api` (local Vite proxies to port 5000). |
 
 ## Data and design decisions
 
@@ -62,7 +62,7 @@ Gatherly is a responsive event discovery and RSVP platform. Organizers can publi
 
 ## Deployment notes
 
-Deploy the backend and frontend separately, configure the environment variables in the hosting dashboards, set `CLIENT_URL` to the deployed frontend origin, and set `VITE_API_URL` to the deployed API base URL before building the frontend. The backend requires a reachable MongoDB instance and will not start without its database URL and signing secret. Free hosting plans may sleep when idle; allow a few seconds for the first request after inactivity.
+Deploy the backend and frontend separately, configure the environment variables in the hosting dashboards, set `CLIENT_URL` to the deployed frontend origin, and set `VITE_API_URL` to the deployed backend origin (for example, `https://your-api.example.com`) before building the frontend. The frontend adds `/api` automatically; you can also provide a URL that already ends with `/api`. The backend requires a reachable MongoDB instance and will not start without its database URL and signing secret. Free hosting plans may sleep when idle; allow a few seconds for the first request after inactivity.
 
 This repository does not include a live deployment, GitHub repository URL, or demo credentials. Create throwaway demo accounts using the seed variables for an evaluation deployment, and share those credentials privately with evaluators.
 

@@ -1,5 +1,39 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api'
+function normalizeApiUrl(value) {
+  const configuredUrl = value?.trim().replace(/\/+$/, '')
+  if (!configuredUrl) return '/api'
+
+  if (/^https?:\/\//i.test(configuredUrl)) {
+    const url = new URL(configuredUrl)
+    if (!/\/api$/i.test(url.pathname.replace(/\/+$/, ''))) {
+      url.pathname = `${url.pathname.replace(/\/+$/, '')}/api`
+    }
+    return url.toString().replace(/\/+$/, '')
+  }
+
+  return /\/api$/i.test(configuredUrl)
+    ? configuredUrl
+    : `${configuredUrl}/api`
+}
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL)
 let token = sessionStorage.getItem('event-token') || ''
+
+export const apiRoutes = {
+  auth: {
+    signup: '/auth/signup',
+    login: '/auth/login',
+  },
+  events: {
+    list: '/events',
+    mine: '/events/mine',
+    registrations: '/events/registrations/mine',
+    create: '/events',
+    byId: (id) => `/events/${encodeURIComponent(id)}`,
+    attendees: (id) => `/events/${encodeURIComponent(id)}/attendees`,
+    register: (id) => `/events/${encodeURIComponent(id)}/register`,
+    cancel: (id) => `/events/${encodeURIComponent(id)}/cancel`,
+  },
+}
 
 export function setAuthToken(value) {
   token = value

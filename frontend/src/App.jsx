@@ -3,7 +3,7 @@ import Alert from './components/Alert'
 import AuthModal from './components/AuthModal'
 import SiteFooter from './components/SiteFooter'
 import SiteHeader from './components/SiteHeader'
-import { api, setAuthToken } from './api'
+import { api, apiRoutes, setAuthToken } from './api'
 import AttendeesPage from './pages/AttendeesPage'
 import DiscoverPage from './pages/DiscoverPage'
 import EventDetailPage from './pages/EventDetailPage'
@@ -41,13 +41,13 @@ export default function App() {
   const [editingEvent, setEditingEvent] = useState(null)
 
   const refreshEvents = useCallback(async () => {
-    const result = await api('/events')
+    const result = await api(apiRoutes.events.list)
     setEvents(result.events)
   }, [])
 
   const refreshPersonalEvents = useCallback(async (currentUser = user) => {
     if (!currentUser) return
-    const path = currentUser.role === 'organizer' ? '/events/mine' : '/events/registrations/mine'
+    const path = currentUser.role === 'organizer' ? apiRoutes.events.mine : apiRoutes.events.registrations
     const result = await api(path)
     if (currentUser.role === 'organizer') setEvents(result.events)
     else setRegistrations(result.events)
@@ -55,7 +55,7 @@ export default function App() {
 
   useEffect(() => {
     let active = true
-    api('/events')
+    api(apiRoutes.events.list)
       .then((result) => { if (active) setEvents(result.events) })
       .catch((error) => { if (active) setNotice(error.message) })
       .finally(() => { if (active) setEventLoading(false) })
@@ -65,7 +65,7 @@ export default function App() {
   useEffect(() => {
     if (!user) return undefined
     let active = true
-    const path = user.role === 'organizer' ? '/events/mine' : '/events/registrations/mine'
+    const path = user.role === 'organizer' ? apiRoutes.events.mine : apiRoutes.events.registrations
     api(path)
       .then((result) => {
         if (!active) return
@@ -94,7 +94,7 @@ export default function App() {
   const openEvent = async (id) => {
     setNotice('')
     try {
-      const result = await api(`/events/${id}`)
+      const result = await api(apiRoutes.events.byId(id))
       setSelectedEvent(result.event)
       setPage('event')
     } catch (error) {
@@ -104,7 +104,7 @@ export default function App() {
 
   const openAttendees = async (event) => {
     try {
-      const result = await api(`/events/${event._id}/attendees`)
+      const result = await api(apiRoutes.events.attendees(event._id))
       setSelectedEvent(event)
       setAttendees(result.attendees)
       setPage('attendees')
@@ -126,7 +126,8 @@ export default function App() {
     if (authMode === 'signup') data.role = role
     setAuthLoading(true)
     try {
-      const result = await api(`/auth/${authMode === 'signup' ? 'signup' : 'login'}`, { method: 'POST', body: data })
+      const authRoute = authMode === 'signup' ? apiRoutes.auth.signup : apiRoutes.auth.login
+      const result = await api(authRoute, { method: 'POST', body: data })
       setAuthToken(result.token)
       sessionStorage.setItem('event-user', JSON.stringify(result.user))
       setUser(result.user)
@@ -157,7 +158,7 @@ export default function App() {
     if (!selectedEvent) return
     setRegistering(true)
     try {
-      const result = await api(`/events/${selectedEvent._id}/register`, { method: 'POST' })
+      const result = await api(apiRoutes.events.register(selectedEvent._id), { method: 'POST' })
       setSelectedEvent(result.event)
       setNotice('You’re on the list! Your seat is confirmed.')
       await Promise.all([refreshPersonalEvents(user), refreshEvents()])
@@ -202,7 +203,7 @@ export default function App() {
       seatLimit: Number(formData.get('seatLimit')),
     }
     try {
-      await api(eventId ? `/events/${eventId}` : '/events', {
+      await api(eventId ? apiRoutes.events.byId(eventId) : apiRoutes.events.create, {
         method: eventId ? 'PATCH' : 'POST',
         body: payload,
       })
@@ -219,7 +220,7 @@ export default function App() {
   const cancelEvent = async (event) => {
     if (!window.confirm(`Cancel “${event.title}”? Attendees will no longer be able to register.`)) return
     try {
-      await api(`/events/${event._id}/cancel`, { method: 'POST' })
+      await api(apiRoutes.events.cancel(event._id), { method: 'POST' })
       setNotice('Event cancelled.')
       await refreshPersonalEvents(user)
     } catch (error) {
