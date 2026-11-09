@@ -4,6 +4,10 @@ function notFoundHandler(req, res) {
 
 function errorHandler(error, req, res, next) {
   if (res.headersSent) return next(error)
+  if (error.name === 'DatabaseUnavailableError') {
+    console.error('MongoDB connection failed:', error.cause || error)
+    return res.status(503).json({ message: 'The event database is temporarily unavailable. Please try again shortly.' })
+  }
   if (error.type === 'entity.parse.failed') {
     return res.status(400).json({ message: 'Please check the request format and try again.' })
   }

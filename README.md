@@ -62,7 +62,7 @@ Gatherly is a responsive event discovery and RSVP platform. Organizers can publi
 
 ## Deployment notes
 
-Deploy the backend and frontend separately, configure the environment variables in the hosting dashboards, set `CLIENT_URL` to the deployed frontend origin, and set `VITE_API_URL` to the deployed backend origin (for example, `https://your-api.example.com`) before building the frontend. The frontend adds `/api` automatically; you can also provide a URL that already ends with `/api`. The backend requires a reachable MongoDB instance and will not start without its database URL and signing secret. Free hosting plans may sleep when idle; allow a few seconds for the first request after inactivity.
+Deploy the backend and frontend separately. In the backend hosting settings, set `CLIENT_URL` to the deployed frontend origin and ensure Atlas permits network access from the backend host. In the frontend hosting settings, set `VITE_API_URL` to the backend origin (for example, `https://your-api.example.com`) before building; the frontend adds `/api` automatically. The backend requires a reachable MongoDB instance and will not start without its database URL and signing secret. Free hosting plans may sleep when idle; allow a few seconds for the first request after inactivity.
 
 This repository does not include a live deployment, GitHub repository URL, or demo credentials. Create throwaway demo accounts using the seed variables for an evaluation deployment, and share those credentials privately with evaluators.
 

@@ -81,4 +81,11 @@ seed.js                     # Fictional events and optional demo accounts
 
 ## Deployment
 
-Deploy this API to a Node-compatible host and configure environment values in its secret manager. Set `CLIENT_URL` to the frontend origin and `TRUST_PROXY=1` if the host uses a single reverse proxy. Configure Atlas network access for the host. Free hosting plans may sleep while idle; the first request can take a few seconds.
+For the current Vercel deployment:
+
+1. In the **backend Vercel project**, set `MONGODB_URI`, `JWT_SECRET`, and `CLIENT_URL=https://gatherly-u229.vercel.app` in the Production environment. `CLIENT_URL` must be the frontend URL (the browser-facing site), not the backend domain. Redeploy after changing variables.
+2. In the **frontend Vercel project**, set `VITE_API_URL=https://gatherly-five-omega.vercel.app` and redeploy. The frontend client adds `/api` automatically.
+3. In Atlas, verify the database user/password and database access. Atlas Network Access must allow connections from the deployed backend. Vercel outbound addresses can vary; prefer a static-egress option when available. For a temporary test only, Atlas may allow `0.0.0.0/0`, but use a strong database password and restrict access again when possible.
+4. Verify `https://gatherly-five-omega.vercel.app/api/health` returns JSON with `status: "ok"` and `/api/events` returns JSON with an `events` array. The database-dependent route must return 200; health alone does not prove MongoDB connectivity.
+
+The API caches its MongoDB connection within a warm serverless instance and waits for connection readiness before database operations. If Atlas is unavailable, database-dependent requests return 503 instead of hanging until Mongoose’s query buffer times out. Free hosting plans may sleep while idle; the first request can take a few seconds.

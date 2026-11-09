@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const { ensureDatabaseConnection } = require('./requireDatabase')
 
 async function authenticate(req, res, next) {
   const header = req.get('authorization') || ''
@@ -7,6 +8,7 @@ async function authenticate(req, res, next) {
   if (!token) return res.status(401).json({ message: 'Please log in to continue.' })
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET)
+    await ensureDatabaseConnection()
     const user = await User.findById(payload.sub).select('_id name email role')
     if (!user) return res.status(401).json({ message: 'Your session has expired. Please log in again.' })
     req.user = user

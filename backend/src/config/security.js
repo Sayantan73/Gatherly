@@ -1,7 +1,9 @@
 function getCorsOptions() {
-  const origins = process.env.CLIENT_URL
-    ? process.env.CLIENT_URL.split(',').map((url) => url.trim()).filter(Boolean)
-    : ['http://localhost:5173']
+  const origins = (process.env.CLIENT_URL || 'http://localhost:5173')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map((value) => new URL(value).origin)
   return { origin: origins }
 }
 
