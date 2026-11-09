@@ -40,6 +40,8 @@ export default function App() {
   const [formError, setFormError] = useState('')
   const [editingEvent, setEditingEvent] = useState(null)
 
+  const dismissNotice = useCallback(() => setNotice(''), [])
+
   const refreshEvents = useCallback(async () => {
     const result = await api(apiRoutes.events.list)
     setEvents(result.events)
@@ -239,7 +241,7 @@ export default function App() {
       <SiteHeader onLogin={() => openAuth('login')} onLogout={() => signOut()} onNavigate={navigate} onSignup={() => openAuth('signup')} page={page} user={user} />
       <main className="mx-auto min-h-[calc(100vh-150px)] max-w-7xl px-4 sm:px-7 lg:px-10">
         <div className="pt-4">
-          <Alert message={notice} onDismiss={() => setNotice('')} />
+          <Alert message={notice} onDismiss={dismissNotice} />
         </div>
         {page === 'discover' && <DiscoverPage events={events} loading={eventLoading} onHostEvent={handleHostEvent} onOpenEvent={openEvent} />}
         {page === 'event' && selectedEvent && <EventDetailPage event={selectedEvent} onBack={() => navigate(user?.role === 'organizer' ? 'dashboard' : 'discover')} onEdit={() => startEdit(selectedEvent)} onRegister={register} registering={registering} user={user} />}

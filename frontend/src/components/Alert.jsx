@@ -1,6 +1,13 @@
+import { useEffect } from 'react'
 import Icon from './Icon'
 
 export default function Alert({ message, onDismiss }) {
+  useEffect(() => {
+    if (!message) return undefined
+    const timeoutId = window.setTimeout(onDismiss, 4000)
+    return () => window.clearTimeout(timeoutId)
+  }, [message, onDismiss])
+
   if (!message) return null
   return (
     <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950" role="status">
